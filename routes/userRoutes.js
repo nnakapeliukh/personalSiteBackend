@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const { validationResult, body } = require("express-validator");
 
 const bcrypt = require("bcrypt");
+const verifyToken = require("./authanticate");
 
 // eslint-disable-next-line no-undef
 let uri = `${process.env.MONGO_URL}`;
@@ -48,6 +49,7 @@ router.post(
   "/login",
   [
     body("email")
+      .toLowerCase()
       .trim()
       .escape(),
     body("password")
@@ -61,25 +63,25 @@ router.post(
       const errorMessage = errors.errors.map(
         (err) => err.value + " " + err.msg
       );
-      res.status(400).json(errorMessage);
+      return res.status(400).json(errorMessage);
     } else {
       //no parsing errors
       const allUsers = await User.find({});
       const matchedUser = allUsers.filter((user) =>
         bcrypt.compareSync(req.body.email, user.email)
       ); // true)
-      const isPwdMatched = matchedUser
+      const isPwdMatched = matchedUser[0]
         ? bcrypt.compareSync(req.body.password, matchedUser[0].password)
         : false;
 
       if (isPwdMatched) {
         // User authenticated, generate token
+        expireTime = Math.floor(new Date() / 1000) + 3600; // gives one hour
         const token = jwt.sign(
-          { id: matchedUser.id, username: matchedUser.username },
+          { id: matchedUser[0]._id, username: matchedUser[0].user_name, exp: expireTime},
           `${process.env.JWT_SECRET}`
         );
-        // res.json({ token });
-        res.cookie('token', token, { httpOnly: true });
+        res.json({ token });
       } else {
         res.status(401).json({ message: "Invalid credentials" });
       }
@@ -117,6 +119,7 @@ router.post(
       .withMessage("Must be >3 chars")
       .isEmail()
       .withMessage("Must be email")
+      .toLowerCase()
       .trim()
       .escape(),
     body("password")
@@ -151,7 +154,9 @@ router.post(
           bcrypt.compareSync(req.body.email, user.email)
         ); // true)
         //  const isPwdMatched = matchedUser ? bcrypt.compareSync(req.body.password, matchedUser[0].password) : false;
-        if (!matchedUser) {
+        if (!matchedUser[0]) {
+        console.log("creating new user");
+
           let newUser = new User({
             first_name: req.body.firstName,
             last_name: req.body.lastName,
@@ -162,7 +167,7 @@ router.post(
           });
           await newUser.save();
 
-          res.status(201).json(newUser);
+          res.status(200).json(newUser);
         } else {
           res.status(400).json(["Email exists"]);
         }
@@ -172,5 +177,12 @@ router.post(
     }
   }
 );
+
+router.get("/", verifyToken ,async (req, res, next) => {
+  // console.log(req);
+  const user = await User.findById(req.user.id);
+  console.log(user);
+  res.json({ message: `Welcome ${user.user_name}, to all users` });
+})
 
 module.exports = router;
