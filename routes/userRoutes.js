@@ -48,13 +48,8 @@ mongoose.connect(uri, { dbName: "usersdb" });
 router.post(
   "/login",
   [
-    body("email")
-      .toLowerCase()
-      .trim()
-      .escape(),
-    body("password")
-      .trim()
-      .escape(),
+    body("email").toLowerCase().trim().escape(),
+    body("password").trim().escape(),
   ],
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -78,7 +73,9 @@ router.post(
         // User authenticated, generate token
         expireTime = Math.floor(new Date() / 1000) + 3600; // gives one hour
         const token = jwt.sign(
-          { id: matchedUser[0]._id, username: matchedUser[0].user_name, exp: expireTime},
+          {
+            exp: expireTime,
+          },
           `${process.env.JWT_SECRET}`
         );
         res.json({ token });
@@ -155,7 +152,7 @@ router.post(
         ); // true)
         //  const isPwdMatched = matchedUser ? bcrypt.compareSync(req.body.password, matchedUser[0].password) : false;
         if (!matchedUser[0]) {
-        console.log("creating new user");
+          console.log("creating new user");
 
           let newUser = new User({
             first_name: req.body.firstName,
@@ -178,11 +175,16 @@ router.post(
   }
 );
 
-router.get("/", verifyToken ,async (req, res, next) => {
+router.get("/", verifyToken, async (req, res, next) => {
   // console.log(req);
   const user = await User.findById(req.user.id);
-  console.log(user);
-  res.json({ message: `Welcome ${user.user_name}, to all users` });
-})
+  res.json({
+    message: `Welcome ${user.user_name}, to all users`,
+    userName: user.user_name,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    city: user.city,
+  });
+});
 
 module.exports = router;
