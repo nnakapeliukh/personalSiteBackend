@@ -74,9 +74,10 @@ router.post(
         expireTime = Math.floor(new Date() / 1000) + 3600; // gives one hour
         const token = jwt.sign(
           {
+            id: matchedUser[0]._id,
             exp: expireTime,
           },
-          `${process.env.JWT_SECRET}`
+          `${process.env.JWT_SECRET}`,
         );
         res.json({ token });
       } else {
@@ -176,15 +177,19 @@ router.post(
 );
 
 router.get("/", verifyToken, async (req, res, next) => {
-  // console.log(req);
-  const user = await User.findById(req.user.id);
-  res.json({
-    message: `Welcome ${user.user_name}, to all users`,
-    userName: user.user_name,
-    firstName: user.first_name,
-    lastName: user.last_name,
-    city: user.city,
-  });
+  try {
+    const user = await User.findById(req.user.id);
+    console.log("tyring to find user: ", req.user.id);
+    res.json({
+      message: `Welcome ${user.user_name}, to all users`,
+      userName: user.user_name,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      city: user.city,
+    });
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 module.exports = router;

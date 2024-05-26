@@ -35,6 +35,6 @@ module.exports = (req, res, next) => {
   const decoded = jwt.verify(token, JWT_SECRET);
   // Adding user information to the request object
   req.user = decoded;
-  console.log(decoded);
+  console.log("logging auth decoded: ", decoded);
   next();
 };
