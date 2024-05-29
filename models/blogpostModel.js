@@ -27,13 +27,15 @@ const blogpostSchema = new Schema({
   tags: {
     type: [String],
   },
-  user: {
-    type: UserModel,
-    required: true,
+  user: {    
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+    // required: true,
   },
-  comments: {
-    type: [CommentModel],
-  },
+  comments: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Comment'
+  }],
 });
 
 const BlogpostModel = mongoose.model("blogposts", blogpostSchema);

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const UserModel = require("./userModel");
+// const UserModel = require("./userModel");
 
 const Schema = mongoose.Schema;
 
@@ -12,9 +12,10 @@ const commentSchema = new Schema({
     type: Date,
     required: true,
   },
-  user: {
-    type: UserModel,
-    required: true,
+  user: {    
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+    // required: true,
   },
 });
 

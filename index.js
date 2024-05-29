@@ -7,6 +7,7 @@ const cors = require("cors");
 // const { loadData } = require("./util/import-mongo/index");
 
 const userRoutes = require("./routes/userRoutes");
+const blogRoutes = require("./routes/blog");
 
 const app = express();
 app.use("*", cors());
@@ -21,7 +22,7 @@ app.use(express.json());
 
 // Use Routes
 app.use("/api/users", userRoutes);
-
+app.use("/api/blog", blogRoutes);
 // Global Error Handler
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
