@@ -15,14 +15,17 @@ let uri = `${process.env.MONGO_URL}`;
 mongoose.connect(uri, { dbName: "usersdb" });
 
 // create new blog post
-router.post("/create", async (req, res, next) => {
+router.post("/create",verifyToken, async (req, res, next) => {
     try{
+        const user = await User.findById(req.user.id);
+
         console.log("CRESTING POST");
         let newPost = new BlogPost({
             title: "First post",
             description: "Short description",
             post_text: "Some text",
-            post_date: Date.now(),            
+            post_date: Date.now(),    
+            user: user,        
         })
         await newPost.save();
         res.status(200).json(newPost);
@@ -33,7 +36,7 @@ router.post("/create", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {   
-    const posts = await BlogPost.find().sort({date: -1}).limit(5);
+    const posts = await BlogPost.find().populate('User').sort({date: -1}).limit(5);
     console.log(posts);
     res.json(posts);
   } catch (e) {

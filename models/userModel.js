@@ -39,7 +39,7 @@ const userSchema = new Schema({
 });
 
 // The first argument is the name of the collection, and the second argument is the schema.
-const UserModel = mongoose.model('users', userSchema);
+const UserModel = mongoose.model('User', userSchema);
 
 // Exporting the CustomersModel to be used in other parts of the application.
 module.exports = UserModel;

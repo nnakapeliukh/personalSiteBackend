@@ -29,8 +29,8 @@ const blogpostSchema = new Schema({
   },
   user: {    
     type: Schema.Types.ObjectId,
-    ref: 'User'
-    // required: true,
+    ref: 'User',
+    required: true,
   },
   comments: [{
     type: Schema.Types.ObjectId,
@@ -38,6 +38,6 @@ const blogpostSchema = new Schema({
   }],
 });
 
-const BlogpostModel = mongoose.model("blogposts", blogpostSchema);
+const BlogpostModel = mongoose.model("Blogpost", blogpostSchema);
 
 module.exports = BlogpostModel;
