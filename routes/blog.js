@@ -49,7 +49,8 @@ router.get("/", async (req, res, next) => {
         description: post.description,
         post_date: post.post_date,
         tags: post.tags,
-        user_name: post.user.user_name
+        user_name: post.user.user_name,
+        id: post._id
       };
     });
     console.log(dataToSend);
