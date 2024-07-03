@@ -51,7 +51,7 @@ router.post(
     body("email").toLowerCase().trim().escape(),
     body("password").trim().escape(),
   ],
-  async (req, res, next) => {
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       // There are errors
@@ -71,12 +71,13 @@ router.post(
 
       if (isPwdMatched) {
         // User authenticated, generate token
-        expireTime = Math.floor(new Date() / 1000) + 3600; // gives one hour
+        const expireTime = Math.floor(new Date() / 1000) + 3600; // gives one hour
         const token = jwt.sign(
           {
             id: matchedUser[0]._id,
             exp: expireTime,
           },
+          /* global process */
           `${process.env.JWT_SECRET}`,
         );
         res.json({ token });
@@ -176,7 +177,7 @@ router.post(
   }
 );
 
-router.get("/", verifyToken, async (req, res, next) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     console.log("tyring to find user: ", req.user.id);
