@@ -22,23 +22,22 @@ router.post(
     body("title")
       .isLength({ min: 5 })
       .withMessage("Must be >5 chars")
-      .isAlphanumeric()
+      // .isAlphanumeric()
       .withMessage("Must be only alphanumeric chars")
       .trim()
       .escape(),
     body("description")
       .isLength({ min: 5 })
       .withMessage("Must be >5 chars")
-      .isAlphanumeric()
+      // .isAlphanumeric()
       .withMessage("Must be only alphanumeric chars")
       .trim()
       .escape(),
     body("text")
       .isLength({ min: 1 })
       .withMessage("Must be >1 chars")
-      .isAlphanumeric()
+      // .isAlphanumeric()
       .withMessage("Must be only alphabetical chars")
-      .trim()
       .escape(),
   ],
   async (req, res) => {
@@ -73,12 +72,36 @@ router.post(
   }
 );
 
+/**
+ * Sends a specific blog post
+ */
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await BlogPost.findById(req.params.id).populate("user");
+    console.log(post);
+
+    const dataToSend = {
+      title: post.title,
+      description: post.description,
+      text: post.post_text,
+      date: post.post_date,
+      userName: post.user.user_name,
+    };
+    console.log(dataToSend);
+
+    res.json(dataToSend);
+  } catch (e) {
+    console.log(e);
+    res.status(400).json(e.errorMessage);
+  }
+});
+
 router.get("/", async (req, res) => {
   try {
     const posts = await BlogPost.find()
       .populate("user")
       .sort({ date: -1 })
-      .limit(5);
+      // .limit(5);
     /** get the data to send back, for the main blog
      *  post page only post title, post description,
      * tags, post date and user  name needed */

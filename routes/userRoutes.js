@@ -177,7 +177,7 @@ router.post(
   }
 );
 
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", verifyToken, async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     console.log("tyring to find user: ", req.user.id);
@@ -189,7 +189,8 @@ router.get("/", verifyToken, async (req, res) => {
       city: user.city,
     });
   } catch (e) {
-    console.log(e);
+    console.log(e.errorMessage);
+    next(e);
   }
 });
 
